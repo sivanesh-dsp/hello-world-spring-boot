@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        NEXUS_URL = 'http://your-nexus-repo-url/repository/maven-releases/'
+        NEXUS_CREDENTIALS = 'nexus'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Publish to Nexus') {
+            steps {
+                script {
+                    sh "mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} -Dusername=\${NEXUS_CREDENTIALS.username} -Dpassword=\${NEXUS_CREDENTIALS.password}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and Publish Successful!'
+        }
+        failure {
+            echo 'Build or Publish Failed!'
+        }
+    }
+}
