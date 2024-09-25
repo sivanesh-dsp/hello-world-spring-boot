@@ -5,7 +5,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/sivanesh-dsp/hello-world-spring-boot.git' // Replace with your Git URL
+                git branch: 'main', url: 'https://github.com/sivanesh-dsp/hello-world-spring-boot.git' 
             }
         }
 
@@ -23,14 +23,14 @@ pipeline {
 
         stage('Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', usernameVariable: 'NEXUS_CREDENTIALS', passwordVariable: 'NEXUS_CREDENTIALS_PSW')]) {
                     nexusArtifactUploader(
                         nexusVersion: 'nexus3',
                         protocol: 'http',
                         nexusUrl: '51.8.241.191:8081', 
                         groupId: 'com.example',
                         version: '0.0.1-SNAPSHOT',
-                        repository: 'poc',
+                        repository: 'maven-snapshots',
                         credentialsId: 'nexus-credentials-id',
                         artifacts: [
                             [
