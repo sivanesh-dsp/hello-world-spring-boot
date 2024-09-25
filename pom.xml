@@ -11,28 +11,47 @@
     <name>hello-world-spring-boot</name>
     <description>Hello World Spring Boot Application</description>
 
+    <!-- Properties for version management -->
     <properties>
         <java.version>11</java.version>
-        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-boot.version>2.7.3</spring-boot.version> <!-- Spring Boot version specified here -->
     </properties>
 
+    <!-- Dependency management -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Dependencies -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <!-- Version inherited from spring-boot-dependencies -->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <!-- Version inherited from spring-boot-dependencies -->
         </dependency>
     </dependencies>
 
+    <!-- Build Plugins -->
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version> <!-- Version tied to spring-boot.version -->
             </plugin>
         </plugins>
     </build>
