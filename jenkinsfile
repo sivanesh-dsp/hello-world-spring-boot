@@ -1,43 +1,58 @@
 pipeline {
     agent any
 
-    environment {
-        NEXUS_URL = 'http://your-nexus-repo-url/repository/maven-releases/'
-        NEXUS_CREDENTIALS = 'nexus'
-    }
-
     stages {
-        stage('Build') {
+
+        stage('Checkout') {
             steps {
-                script {
-                    sh 'mvn clean package'
-                }
+                git branch: 'main', url: 'https://github.com/sivanesh-dsp/hello-world-spring-boot.git' // Replace with your Git URL
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    sh 'mvn test'
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    nexusArtifactUploader(
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        nexusUrl: '51.8.241.191:8081', 
+                        groupId: 'com.example',
+                        version: '0.0.1-SNAPSHOT',
+                        repository: 'poc',
+                        credentialsId: 'nexus-credentials-id',
+                        artifacts: [
+                            [
+                                artifactId: 'hello-world-spring-boot', 
+                                classifier: '',
+                                file: 'target/hello-world-spring-boot-0.0.1-SNAPSHOT.jar', 
+                                type: 'jar'
+                            ]
+                        ]
+                    )
                 }
             }
         }
 
-        stage('Publish to Nexus') {
-            steps {
-                script {
-                    sh "mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} -Dusername=\${NEXUS_CREDENTIALS.username} -Dpassword=\${NEXUS_CREDENTIALS.password}"
-                }
-            }
-        }
     }
 
     post {
         success {
-            echo 'Build and Publish Successful!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Build or Publish Failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
